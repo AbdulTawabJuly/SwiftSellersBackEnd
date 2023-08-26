@@ -1836,25 +1836,6 @@
       ]
     },
     {
-      "title": "Beauty Oil",
-      "description": "Beauty oil for skin and hair of any type",
-      "brand": "L'Oreal Paris",
-      "category": "skincare",
-      "price": "1500",
-      "discountPercentage": "10",
-      "stock": "60",
-      "thumbnail": "https://i.dummyjson.com/data/products/19/thumbnail.jpg",
-      "image2": "https://i.dummyjson.com/data/products/19/2.jpg",
-      "images": [
-        "https://i.dummyjson.com/data/products/19/1.jpg",
-        "https://i.dummyjson.com/data/products/19/2.jpg",
-        "https://i.dummyjson.com/data/products/19/3.png",
-        "https://i.dummyjson.com/data/products/19/thumbnail.jpg"
-      ],
-      "rating": 0,
-      "id": 101
-    },
-    {
       "title": "iPhone 9",
       "description": "An apple mobile which is nothing like apple",
       "brand": "Apple",

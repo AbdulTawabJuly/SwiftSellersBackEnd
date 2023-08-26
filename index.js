@@ -5,8 +5,11 @@ const { createProduct } = require("./controller/Product");
 const productsRouters = require("./routes/Products");
 const categoriesRouters = require("./routes/Categories");
 const brandsRouters = require("./routes/Brands");
-
+const cors = require("cors");
 //middleware
+server.use(cors({
+  exposedHeaders:["X-Total-Count"]
+})); // for cross origin problem (aik server se doosre server call ni kar sakte)
 server.use(express.json()); //to parse req.body
 server.use("/products", productsRouters.router);
 server.use("/categories", categoriesRouters.router);
