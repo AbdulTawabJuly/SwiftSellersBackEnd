@@ -33,8 +33,8 @@ opts.secretOrKey = SECRET_KEY;
 server.use(
   session({
     secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: false,
+    resave: false, // dont save session if un modifies
+    saveUninitialized: false, // dont create session untill something stored
   })
 );
 server.use(passport.authenticate("session"));
@@ -52,6 +52,7 @@ server.use("/auth", authRouter.router);
 server.use("/cart", isAuth(), cartRouter.router);
 server.use("/orders", isAuth(), ordersRouter.router);
 
+//Passport Strategies
 passport.use(
   "local", //this is only name
   { usernameField: "email" },
