@@ -57,8 +57,12 @@ server.use("/orders", isAuth(), ordersRouter.router);
 //Passport Strategies
 passport.use(
   "local", //this is only name
-  { usernameField: "email" },
-  new LocalStrategy(async function (email, password, done) {
+
+  new LocalStrategy({ usernameField: "email" }, async function (
+    email,
+    password,
+    done
+  ) {
     // by default passport uses username
     console.log(email);
     try {
@@ -93,7 +97,7 @@ passport.use(
   "jwt",
   new JwtStrategy(opts, async function (jwt_payload, done) {
     try {
-      const user = await User.findById({ id: jwt_payload.id });
+      const user = await User.findById( jwt_payload.id );
       if (user) {
         return done(null, sanitizeUser(user));
       } else {
