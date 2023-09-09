@@ -29,7 +29,7 @@ exports.createUser = async (req, res) => {
                 httpOnly: true,
               })
               .status(201)
-              .json(token);
+              .json({ id: doc.id, role: doc.role });
           }
         });
         // res.status(201).json();
@@ -51,6 +51,10 @@ exports.loginUser = async (req, res) => {
 };
 // req.user aik special obeject hai jo passport bnata hai jab user authenticate ho jata hai
 
-exports.checkUser = async (req, res) => {
-  res.json({ status: "succes", user: req.user });
+exports.checkAuth = async (req, res) => {
+  if (req.user) {
+    res.json(req.user);
+  } else {
+    res.sendStatus(401);
+  }
 };

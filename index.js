@@ -83,7 +83,7 @@ passport.use(
           }
           const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
 
-          done(null, { token });
+          done(null, { id: user.id, role: user.role });
         }
       );
     } catch (err) {
@@ -97,7 +97,7 @@ passport.use(
   "jwt",
   new JwtStrategy(opts, async function (jwt_payload, done) {
     try {
-      const user = await User.findById( jwt_payload.id );
+      const user = await User.findById(jwt_payload.id);
       if (user) {
         return done(null, sanitizeUser(user));
       } else {
