@@ -14,6 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@stripe/react-stripe-js": "^2.2.0",
+    "@stripe/stripe-js": "^2.1.2",
     "connect-sqlite": "^0.0.1",
     "connect-sqlite3": "^0.9.13",
     "cookie-parser": "^1.4.6",
@@ -24,6 +26,7 @@
     "mongoose": "^7.4.4",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "stripe": "^13.5.0"
   }
 }
