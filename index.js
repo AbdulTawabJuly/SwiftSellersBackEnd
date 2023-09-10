@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const server = express();
 const mongoose = require("mongoose");
@@ -23,18 +24,51 @@ const cartRouter = require("./routes/Cart");
 const ordersRouter = require("./routes/Order");
 const { isAuth, sanitizeUser, cookieExtractor } = require("./services/common");
 
-const SECRET_KEY = "SECRET_KEY";
+//Webhook
+const endpointSecret = process.env.ENDPOINT_SECRET;
+server.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  (request, response) => {
+    const sig = request.headers["stripe-signature"];
+
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    } catch (err) {
+      response.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+
+    // Handle the event
+    switch (event.type) {
+      case "payment_intent.succeeded":
+        const paymentIntentSucceeded = event.data.object;
+        // Then define and call a function to handle the event payment_intent.succeeded
+        break;
+      // ... handle other event types
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+
+    // Return a 200 response to acknowledge receipt of the event
+    response.send();
+  }
+);
+
+
 //JWT Options
 const opts = {};
 opts.jwtFromRequest = cookieExtractor;
-opts.secretOrKey = SECRET_KEY;
+opts.secretOrKey = process.env.JWT_SECRET_KEY;
 
 //middleware
 server.use(express.static("build"));
 server.use(cookieParser());
 server.use(
   session({
-    secret: "keyboard cat",
+    secret: process.env.SESSION_KEY,
     resave: false, // dont save session if un modifies
     saveUninitialized: false, // dont create session untill something stored
   })
@@ -81,9 +115,12 @@ passport.use(
           if (!crypto.timingSafeEqual(user.password, hashedPassword)) {
             return done(null, false, { message: "Invalid Password" });
           }
-          const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
+          const token = jwt.sign(
+            sanitizeUser(user),
+            process.env.JWT_SECRET_KEY
+          );
 
-          done(null, { id: user.id, role: user.role });
+          done(null, { id: user.id, role: user.role,token }); // this line is send to serializer
         }
       );
     } catch (err) {
@@ -122,25 +159,16 @@ passport.deserializeUser(function (user, cb) {
   });
 });
 
-
-
-
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // This is your test secret API key.
-const stripe = require("stripe")('sk_test_51NoQGmSDkACrq3oOCKvupOYTvJadCs6ErCYcArqHezd5zJcsJ3gRq97t6CVBLEbOi5TLSKpRomIDJ0muzRL9a5lq003WgZV7oc');
-const calculateOrderAmount = (items) => {
-  // Replace this constant with a calculation of the order's amount
-  // Calculate the order total on the server to prevent
-  // people from directly manipulating the amount on the client
-  return 1400;
-};
+const stripe = require("stripe")(process.env.STRIPE_SERVER_KEY);
 
 server.post("/create-payment-intent", async (req, res) => {
-  const { items } = req.body;
+  const { totalAmount } = req.body;
 
   // Create a PaymentIntent with the order amount and currency
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: calculateOrderAmount(items),
+    amount: totalAmount * 100,
     currency: "inr",
     // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
     automatic_payment_methods: {
@@ -156,14 +184,13 @@ server.post("/create-payment-intent", async (req, res) => {
 
 
 
-
 main().catch((err) => console.log(err));
 async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/swiftsellers");
+  await mongoose.connect(process.env.MONGODB_URL);
   console.log("Databse Connected");
 }
 
-server.listen(8080, () => {
+server.listen(process.env.PORT, () => {
   console.log("Server is running");
   //This is a call back function to show port kis state mai hai
 });
